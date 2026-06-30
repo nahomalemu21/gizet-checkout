@@ -273,7 +273,7 @@
   ];
 
   let selectedProduct = PRODUCTS[0];
-  let qty = 1;
+  let qty = Math.max(1, parseInt(params.get('quantity') || params.get('qty') || '1', 10) || 1);
   let filteredProducts = [...PRODUCTS];
 
   function renderProducts(list) {
@@ -329,11 +329,16 @@
           </div>
           <img src="${match.image}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;margin-left:auto;flex-shrink:0" />
         </div>`;
+    } else {
+      renderProducts(PRODUCTS);
     }
   } else {
     renderProducts(PRODUCTS);
-    updateTotal();
   }
+
+  // Reflect quantity (from URL) + total on load — fixes total showing "ETB —"
+  document.getElementById('qty-display').textContent = qty;
+  updateTotal();
 
   // ── Submit ──
   async function handleSubmit() {
