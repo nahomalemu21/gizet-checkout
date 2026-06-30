@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order — Gizet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2097092354473622');
+    fbq('track', 'PageView');
+  </script>
+  <style>
+    :root {
+      --green:       #1A7A4A;
+      --green-light: #22A05E;
+      --green-dim:   #E8F5EE;
+      --gold:        #D4A853;
+      --dark:        #0F1A13;
+      --mid:         #3D5246;
+      --muted:       #6B8070;
+      --surface:     #F7FAF8;
+      --white:       #FFFFFF;
+      --border:      #D1DED7;
+      --error:       #C0392B;
+      --radius:      12px;
+      --radius-sm:   8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .logo { font-weight: 700; font-size: 22px; color: var(--green); }
+    .secure-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); font-weight: 500; }
+
+    main { flex: 1; max-width: 520px; width: 100%; margin: 0 auto; padding: 24px 16px 48px; }
+
+    .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 16px; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .card-header-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--green-dim); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .card-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .card-body { padding: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    label .am { font-family: 'Noto Sans Ethiopic', sans-serif; font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 4px; }
+    input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Inter', sans-serif; color: var(--dark); background: var(--white); transition: border-color 0.15s; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.08); }
+    input.error, select.error { border-color: var(--error); }
+    .field-error { font-size: 11px; color: var(--error); margin-top: 4px; display: none; }
+
+    .product-search { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Inter', sans-serif; color: var(--dark); background: var(--white); outline: none; margin-bottom: 10px; }
+    .product-search:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.08); }
+    .product-list { max-height: 260px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: var(--radius-sm); }
+    .product-option { padding: 11px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
+    .product-option:last-child { border-bottom: none; }
+    .product-option:hover { background: var(--green-dim); }
+    .product-option.selected { background: var(--green-dim); border-left: 3px solid var(--green); }
+    .product-option img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+    .product-option-name { font-size: 13px; font-weight: 600; color: var(--dark); flex: 1; }
+    .product-option-price { font-size: 13px; font-weight: 700; color: var(--green); white-space: nowrap; }
+
+    .qty-row { display: flex; align-items: center; gap: 12px; }
+    .qty-btn { width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--dark); transition: border-color 0.15s; flex-shrink: 0; }
+    .qty-btn:hover { border-color: var(--green); color: var(--green); }
+    .qty-display { font-size: 18px; font-weight: 700; color: var(--dark); min-width: 30px; text-align: center; }
+
+    .total-row { background: var(--green-dim); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .total-label { font-size: 13px; font-weight: 600; color: var(--mid); }
+    .total-amount { font-size: 20px; font-weight: 700; color: var(--green); }
+
+    .submit-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .submit-btn:hover { background: #155F3A; }
+    .submit-btn:disabled { background: var(--muted); cursor: not-allowed; }
+    .submit-am { font-family: 'Noto Sans Ethiopic', sans-serif; font-weight: 400; font-size: 13px; opacity: 0.85; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg width="80" height="30" viewBox="0 0 356.41 132.02" xmlns="http://www.w3.org/2000/svg" fill="#1A7A4A">
+      <path d="m9.28,109.72c4.89,1.8,9.16,3.57,13.56,4.93,8.61,2.68,17.39,4.23,26.39,2.28,7.35-1.59,10.54-5.55,10.78-13.08.08-2.56.01-5.12.01-7.05-6.23,1.69-12.16,4.06-18.3,4.82-16.77,2.07-32.42-6.28-38.2-19.94C-4.63,62.38.3,34.29,29.59,25.8c14.14-4.1,28.44-2.99,42.74-.97,2.88.41,6.79.19,8.27,1.93,1.49,1.75.65,5.58.65,8.49-.03,22.62-.09,45.25-.16,67.87-.05,13.27-5.82,21.78-18.44,25.7-17.04,5.28-33.97,3.64-50.6-2.23-.77-.27-1.73-1.28-1.8-2.02-.44-4.81-.65-9.64-.96-14.86Zm50.68-48.76h.03c0-6.44-.06-12.89.03-19.33.03-1.96-.52-2.92-2.61-2.96-3.5-.06-7-.49-10.49-.39-8.33.22-15.59,2.91-20.33,10.21-3.72,5.73-4.5,12.18-3.92,18.88,1.78,20.65,22.74,24.32,35.09,16.27,1.13-.74,2.06-2.64,2.11-4.04.23-6.21.1-12.43.1-18.65Z"/>
+      <path d="m294.06,98.71c-4.21.95-8.11,2.04-12.09,2.69-12.23,2.02-24.48,2.77-36.8.55-20.08-3.61-32.56-17.78-32.99-37.61-.47-21.66,15.28-39.19,37.01-41.11,7.98-.71,15.8-.16,23.27,3.18,10.3,4.61,16.97,12.42,19.67,23.22,1.52,6.08,1.81,12.46,2.73,19.23h-60c.41,6.95,3.62,11.7,8.84,15.17,8.56,5.7,18.22,5.76,27.86,4.59,6.8-.82,13.49-2.56,20.62-3.96.58,4.31,1.2,8.96,1.89,14.03Zm-18.81-43.11c-.05-6.53-1.87-12.1-7.43-15.53-7.74-4.78-15.97-4.74-23.84-.44-6.04,3.3-8.77,8.99-9.54,15.97h40.81Z"/>
+      <path d="m354.09,88.22c.77,4.24,1.5,8.2,2.32,12.73-11.69,1.75-23.02,4.22-34.34.01-6.95-2.59-10.67-8.12-10.98-15.37-.47-10.84-.37-21.71-.49-32.57-.04-3.84,0-7.67,0-11.99h-11.48v-14.93h11.51c0-4.76.1-9.14-.04-13.52-.06-1.94.55-2.77,2.47-3.23,6.34-1.52,12.63-3.25,19.37-5.01v21.7h21.84v14.78h-20.97c-.46.56-.72.73-.72.9,0,12.78-.17,25.56.14,38.33.14,5.9,2.71,8.13,8.69,8.78,2.12.23,4.29.08,6.43-.03,2.01-.1,4.01-.37,6.27-.59Z"/>
+      <path d="m194.3,28.81c-15.77.53-31.53,1.06-48.22,1.62,3.15,4.92,5.82,9.11,8.59,13.44-2.74,1.83-4.95.77-6.25-.66-4.54-5.01-8.96-10.16-12.97-15.59-1.96-2.66-.32-4.79,3.44-4.85,7.81-.12,15.62-.02,23.43-.13,13.01-.19,26.01-.5,39.01-.7,1.34-.02,2.72.2,4.02.55,3.73,1,4.73,4.06,2.19,6.92-15.16,17.1-30.4,34.12-45.53,51.24-5.24,5.93-10.26,12.06-15.34,18.13-.84,1-1.46,2.18-2.66,4,18.89-.3,37.1-1.32,54.79,4.43.17-.37.34-.73.51-1.1-2.6-4.2-5.3-8.35-7.76-12.63-.9-1.56-3.5-3.48-1.12-5.18,2.24-1.6,4.32.48,5.63,2.34,4.22,6.01,8.43,12.04,12.34,18.25,2.17,3.45.81,5.73-3.31,5.74-2.8.01-5.7-.32-8.37-1.13-17.47-5.27-35.38-4.3-53.25-4.09-2.15.03-4.33.14-6.44-.17-4.94-.71-6.34-3.64-3.28-7.49,7.23-9.12,14.57-18.17,22.16-26.99,12.25-14.23,24.74-28.24,37.11-42.37.64-.73,1.1-1.62,1.65-2.44-.12-.39-.25-.78-.37-1.17Z"/>
+      <path d="m121.04,101.65h-22.49V25.29h22.49v76.36Z"/>
+      <path d="m98.24,9.85c7.68-3.24,15.35-6.48,23.31-9.85v10.8h-23.02c-.1-.32-.19-.64-.29-.96Z"/>
+    </svg>
+  </div>
+  <div class="secure-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Secure Order
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">🛍️</div>
+      <div>
+        <div class="card-title">Choose your item</div>
+        <div class="card-sub">ምርት ይምረጡ</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <input class="product-search" id="product-search" placeholder="🔍 Search product..." oninput="filterProducts()" />
+      <div class="product-list" id="product-list"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">👤</div>
+      <div>
+        <div class="card-title">Your details</div>
+        <div class="card-sub">የእርስዎ መረጃ</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="form-group">
+        <label>Phone Number <span class="am">/ ስልክ ቁጥር</span></label>
+        <input type="text" id="phone" placeholder="09XX XXX XXX" />
+        <div class="field-error" id="phone-error">Please enter your phone number</div>
+      </div>
+
+      <div class="form-group">
+        <label>First Name <span class="am">/ ስምዎ</span></label>
+        <input type="text" id="first-name" placeholder="ስም" />
+        <div class="field-error" id="name-error">Please enter your name</div>
+      </div>
+
+      <div class="form-group">
+        <label>Last Name <span class="am">/ የአባት ስም</span></label>
+        <input type="text" id="last-name" placeholder="የአባት ስም" />
+      </div>
+
+      <div class="form-group">
+        <label>Address <span class="am">/ አድራሻ</span></label>
+        <input type="text" id="address" placeholder="ፒያሳ" />
+      </div>
+
+      <div class="form-group">
+        <label>Region <span class="am">/ ክልል</span></label>
+        <select id="region">
+          <option value="">— Select Region —</option>
+          <option>Addis Ababa</option>
+          <option>Oromia</option>
+          <option>Amhara</option>
+          <option>Tigray</option>
+          <option>Sidama</option>
+          <option>SNNPR</option>
+          <option>Somali</option>
+          <option>Afar</option>
+          <option>Benishangul-Gumuz</option>
+          <option>Gambela</option>
+          <option>Harari</option>
+          <option>Dire Dawa</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Delivery Time <span class="am">/ መቼ እንዲይወልልዎት ይፈልጋሉ?</span></label>
+        <select id="delivery-time">
+          <option value="">— Select —</option>
+          <option>As soon as possible / በተቻለ ፍጥነት</option>
+          <option>Morning (8am–12pm) / ጠዋት</option>
+          <option>Afternoon (12pm–5pm) / ከሰዓት</option>
+          <option>Evening (5pm–8pm) / ማታ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Quantity <span class="am">/ ብዛት</span></label>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <div class="qty-display" id="qty-display">1</div>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <div class="total-row">
+        <span class="total-label">Total / ጠቅላላ</span>
+        <span class="total-amount" id="total-display">ETB —</span>
+      </div>
+
+      <br/>
+      <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+        <span id="btn-text">Place Order</span>
+        <span class="submit-am">· ትዕዛዝ ያስገቡ</span>
+      </button>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>© 2025 Gizet · Addis Ababa</footer>
+
+<script>
+  // ── Read UTMs from URL and persist ──
+  const params = new URLSearchParams(window.location.search);
+  const utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+  utmKeys.forEach(k => { if (params.get(k)) sessionStorage.setItem(k, params.get(k)); });
+  const utmData = {};
+  utmKeys.forEach(k => { const v = params.get(k) || sessionStorage.getItem(k); if (v) utmData[k] = v; });
+
+  // ── Pre-select product if ?variant= is in URL ──
+  const variantParam = params.get('variant');
+
+  const PRODUCTS = [
+    { variantId: 45686304899270, title: '2-Tier Dish Drying Rack Organizer', price: 5999, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-04-03_23-37-49.jpg?v=1775248786' },
+    { variantId: 45687677812934, title: '3-Piece Fabric Resistance Bands Set', price: 2499, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr4_2026_10_14_13PM.png?v=1775312061' },
+    { variantId: 45686357328070, title: '3-Tier Clothes Drying Rack', price: 4200, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-04-04_00-09-55.jpg?v=1775250655' },
+    { variantId: 45920024658118, title: '360 Degree Rotate Car Seat', price: 28500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-05_23-44-50.jpg?v=1780692473' },
+    { variantId: 45686287597766, title: '360° Spice Carousel Rack', price: 2900, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr5_2026_12_21_24PM.png?v=1775362903' },
+    { variantId: 45920064307398, title: '4-in-1 Magnetic Board Game Set', price: 4700, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-06_00-29-05.jpg?v=1780695011' },
+    { variantId: 45867703599302, title: '49 Key Kids Keyboard', price: 5500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/6_5a6b544e-af3e-4b70-a7af-6a518231590b.png?v=1779382980' },
+    { variantId: 45686296772806, title: '6-Compartment Food Prep Organizer', price: 2450, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-04-03_23-31-14.jpg?v=1775248304' },
+    { variantId: 45686315614406, title: '7-Piece Airtight Food Storage Container Set', price: 4999, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/Airtight_containers_with_pantry_staples_1.png?v=1775293799' },
+    { variantId: 45687659135174, title: 'Adjustable Ankle Weights (Pair)', price: 5799, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr5_2026_12_14_10PM.png?v=1775362459' },
+    { variantId: 45867669684422, title: 'Adjustable Base For Washing Machine & Refrigerator', price: 2700, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-05-21_19-30-22.jpg?v=1779381193' },
+    { variantId: 45687657627846, title: 'Adjustable Hand Grip Strength Trainer', price: 2599, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr4_2026_08_51_48PM.png?v=1775307129' },
+    { variantId: 45687678828742, title: 'Adjustable Knee Support Brace', price: 2499, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr4_2026_10_18_27PM.png?v=1775312320' },
+    { variantId: 45660473032902, title: 'Afnan Rare Reef Extrait De Parfum - 100ml', price: 14000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_5870601810211441765_y.jpg?v=1774766394' },
+    { variantId: 45937609507014, title: 'Airpod Lenovo Thinkplus Xt80 Wireless', price: 5200, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-11_21-08-40.jpg?v=1781201553' },
+    { variantId: 45937561764038, title: 'Airpods Soloffer Solo-A8 Anc', price: 4700, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-11_20-59-05.jpg?v=1781200935' },
+    { variantId: 45867863900358, title: 'Aluminum Portable PC Stand and Holder', price: 2100, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/18.jpg?v=1779388507' },
+    { variantId: 45870653014214, title: 'Armaf Club De Nuit Woman', price: 10300, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-05-22_16-54-06.jpg?v=1779458096' },
+    { variantId: 45870399422662, title: 'Baby Food Maker Steamer and Blender', price: 5300, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/31.jpg?v=1779452763' },
+    { variantId: 45971561185478, title: 'Baby Nursing Essentials Bundle', price: 3800, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_8.png?v=1782415820' },
+    { variantId: 45920027902150, title: 'Baby Scooter Big', price: 14000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-05_23-49-46.jpg?v=1780692708' },
+    { variantId: 45971578093766, title: 'Backyard Water Play Combo', price: 22700, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_9_2.png?v=1782415757' },
+    { variantId: 45920068796614, title: 'Billiard Balls Pool', price: 13000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-06_00-37-24.jpg?v=1780695523' },
+    { variantId: 45870648426694, title: 'Black Diamond Incense by Ibraheem Al-Qurashi', price: 13500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-05-22_16-50-21.jpg?v=1779457912' },
+    { variantId: 45937580638406, title: 'Bluetooth Neckband Samsung Yg07 Bass', price: 3250, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-11_21-03-12.jpg?v=1781201165' },
+    { variantId: 45920091275462, title: 'Car Racing Adventure Toys', price: 9500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-06_00-50-43.jpg?v=1780696337' },
+    { variantId: 45660473295046, title: 'Chance Eau De Parfum', price: 7300, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/p__2.jpg?v=1774766400' },
+    { variantId: 45870410629318, title: 'Children Folding Bath Tub', price: 12000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/1_37ae6a82-93e2-472b-9a1f-30992b5e51f7.png?v=1779453234' },
+    { variantId: 45867670995142, title: 'Children Fountain', price: 4200, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/2_95a9e292-cc43-49ac-a5c9-4673bbe18361.jpg?v=1779381520' },
+    { variantId: 45971663651014, title: 'Classic & Collector\'s Family Game Set', price: 12299, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_13.png?v=1782310378' },
+    { variantId: 45660473360582, title: 'Coco Mademoiselle Eau De Parfum Intense', price: 7300, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/p__4.jpg?v=1774766401' },
+    { variantId: 45686327673030, title: 'Cookie Press & Decorating Kit', price: 3599, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-04-03_23-54-13.jpg?v=1775249680' },
+    { variantId: 45920042385606, title: 'Cozy Maternity & Nursing Bra', price: 1950, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-06_00-12-29.jpg?v=1780693998' },
+    { variantId: 45686358442182, title: 'Creative Kids Play Dough Set', price: 2199, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-04-04_00-13-18.jpg?v=1775295190' },
+    { variantId: 45870406729926, title: 'Dancing Talking Cactus Toys With Music Led Light', price: 2600, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/32_f9c26016-8ec5-44d1-8b6f-ab3327639451.jpg?v=1779453125' },
+    { variantId: 45867691802822, title: 'Double Side Magnetic Dart', price: 4000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/5_db04d811-3c98-4934-8ad8-82b7f41725cf.png?v=1779382602' },
+    { variantId: 45867684167878, title: 'Double Six Dominoes Set of 28 Piece', price: 2899, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/6_26eb7d47-f285-4ce1-9e92-ff1cb433237a.jpg?v=1779382276' },
+    { variantId: 45660473098438, title: 'Emporio Armani Skeleton Mechanical Watch', price: 8000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_5870601810211441773_y.jpg?v=1774766396' },
+    { variantId: 45920112181446, title: 'Emulation Car Gravity Sensor', price: 9500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-06_00-54-03.jpg?v=1780696494' },
+    { variantId: 45971572129990, title: 'Essential New Parent Starter Bundle', price: 17300, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_12.png?v=1782319946' },
+    { variantId: 45937619927238, title: 'Evening Golden Lurex', price: 9999, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-11_21-14-11.jpg?v=1781201790' },
+    { variantId: 45687668441286, title: 'Extra Thick 8.5mm Yoga Mat with Strap', price: 3199, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr5_2026_12_17_28PM.png?v=1775362657' },
+    { variantId: 45919975997638, title: 'F11-2 Mic', price: 3900, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-05_23-04-58.jpg?v=1780690286' },
+    { variantId: 45867623022790, title: 'Flame Aroma Diffuser Humidifier', price: 2650, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-05-21_18-35-02.jpg?v=1779377750' },
+    { variantId: 45971597066438, title: 'Grow with Me Ultimate Safety & Travel Set', price: 33500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_1.png?v=1782313418' },
+    { variantId: 45687681056966, title: 'Hand Gripper 5 Pieces Grip Strength Trainer', price: 3399, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/ChatGPTImageApr4_2026_10_22_59PM.png?v=1775312591' },
+    { variantId: 45660473196742, title: 'Hublot Skeleton Mechanical Watch', price: 8000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_5870601810211441774_y.jpg?v=1774766397' },
+    { variantId: 45870642135238, title: 'IBRAQ Nude Coral Diamond', price: 13500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-05-22_16-47-13.jpg?v=1779457825' },
+    { variantId: 45920033341638, title: 'Infant Feeding Suite', price: 6500, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/photo_2026-06-05_23-56-05.jpg?v=1780693245' },
+    { variantId: 45971602276550, title: 'Infantino Cuddle Up Ergonomic Hoodie Baby Carrier', price: 26000, image: 'https://cdn.shopify.com/s/files/1/0734/4996/3718/files/bundle_2.png?v=1782312332' },
+  ];
+
+  let selectedProduct = PRODUCTS[0];
+  let qty = 1;
+  let filteredProducts = [...PRODUCTS];
+
+  function renderProducts(list) {
+    const container = document.getElementById('product-list');
+    container.innerHTML = list.map((p, i) => `
+      <div class="product-option ${p.variantId === selectedProduct.variantId ? 'selected' : ''}"
+           onclick="selectProduct(${PRODUCTS.indexOf(p)})">
+        <img src="${p.image}" alt="${p.title}" onerror="this.style.display='none'" />
+        <span class="product-option-name">${p.title}</span>
+        <span class="product-option-price">ETB ${p.price.toLocaleString()}</span>
+      </div>
+    `).join('');
+  }
+
+  function filterProducts() {
+    const q = document.getElementById('product-search').value.toLowerCase();
+    filteredProducts = q ? PRODUCTS.filter(p => p.title.toLowerCase().includes(q)) : [...PRODUCTS];
+    renderProducts(filteredProducts);
+  }
+
+  function selectProduct(i) {
+    selectedProduct = PRODUCTS[i];
+    renderProducts(filteredProducts);
+    updateTotal();
+    // scroll selected item into view
+    const sel = document.querySelector('.product-option.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+
+  function changeQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qty-display').textContent = qty;
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const total = selectedProduct.price * qty;
+    document.getElementById('total-display').textContent = 'ETB ' + total.toLocaleString();
+  }
+
+  // If coming from a product page, pre-select and hide the picker
+  if (variantParam) {
+    const match = PRODUCTS.find(p => String(p.variantId) === variantParam);
+    if (match) {
+      selectedProduct = match;
+      // Replace product card with a single selected product display
+      document.querySelector('.card').innerHTML = `
+        <div class="card-header">
+          <div class="card-header-icon">🛍️</div>
+          <div>
+            <div class="card-title">${match.title}</div>
+            <div class="card-sub" style="color:var(--green);font-weight:600">ETB ${match.price.toLocaleString()}</div>
+          </div>
+          <img src="${match.image}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;margin-left:auto;flex-shrink:0" />
+        </div>`;
+    }
+  } else {
+    renderProducts(PRODUCTS);
+    updateTotal();
+  }
+
+  // ── Submit ──
+  async function handleSubmit() {
+    let valid = true;
+    const firstName    = document.getElementById('first-name').value.trim();
+    const lastName     = document.getElementById('last-name').value.trim();
+    const phone        = document.getElementById('phone').value.trim();
+    const address      = document.getElementById('address').value.trim();
+    const region       = document.getElementById('region').value;
+    const deliveryTime = document.getElementById('delivery-time').value;
+
+    if (!firstName) {
+      document.getElementById('name-error').style.display = 'block';
+      document.getElementById('first-name').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('name-error').style.display = 'none';
+      document.getElementById('first-name').classList.remove('error');
+    }
+
+    if (!phone) {
+      document.getElementById('phone-error').style.display = 'block';
+      document.getElementById('phone').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('phone-error').style.display = 'none';
+      document.getElementById('phone').classList.remove('error');
+    }
+
+    if (!valid) return;
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div><span>Placing order...</span>';
+
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'InitiateCheckout', { value: selectedProduct.price * qty, currency: 'ETB', num_items: qty });
+    }
+
+    const noteExtra = [
+      deliveryTime && `Delivery: ${deliveryTime}`,
+      address      && `Address: ${address}`,
+      region       && `Region: ${region}`,
+    ].filter(Boolean).join(' | ');
+
+    const payload = {
+      lineItems: [{
+        title:    selectedProduct.title,
+        quantity: qty,
+        price:    String(selectedProduct.price),
+        ...(selectedProduct.variantId ? { variant_id: selectedProduct.variantId } : {}),
+      }],
+      customer: { first_name: firstName, last_name: lastName, phone },
+      shippingAddress: {
+        first_name:   firstName,
+        last_name:    lastName,
+        phone,
+        address1:     address,
+        city:         region || 'Addis Ababa',
+        country:      'Ethiopia',
+        country_code: 'ET',
+      },
+      noteExtra,
+      ...utmData,
+    };
+
+    try {
+      const res  = await fetch('/api/gizet/draft-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      // Fire Meta Pixel Lead event
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead', { value: selectedProduct.price * qty, currency: 'ETB' });
+      }
+
+      window.location.href = data.confirmUrl;
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span id="btn-text">Place Order</span><span class="submit-am">· ትዕዛዝ ያስገቡ</span>';
+      alert('Something went wrong: ' + err.message);
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ክፍያ ማረጋገጫ — Gizet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Meta Pixel Base Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2097092354473622');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=2097092354473622&ev=PageView&noscript=1"/>
+  </noscript>
+
+  <style>
+    :root {
+      --green:       #1A7A4A;
+      --green-light: #22A05E;
+      --green-dim:   #E8F5EE;
+      --gold:        #D4A853;
+      --dark:        #0F1A13;
+      --mid:         #3D5246;
+      --muted:       #6B8070;
+      --surface:     #F7FAF8;
+      --white:       #FFFFFF;
+      --border:      #D1DED7;
+      --error:       #C0392B;
+      --radius:      12px;
+      --radius-sm:   8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .secure-badge svg {
+      color: var(--green);
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    /* ── Steps indicator ── */
+    .steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .step.active { color: var(--green); }
+    .step.done { color: var(--green-light); }
+
+    .step-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step.active .step-dot {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    .step.done .step-dot {
+      background: var(--green-light);
+      border-color: var(--green-light);
+      color: white;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin: 0 6px;
+    }
+
+    /* ── Timer Banner ── */
+    .timer-banner {
+      background: linear-gradient(135deg, #FFF8EC 0%, #FFF3DC 100%);
+      border: 1px solid #F0D080;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .timer-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .timer-text {
+      flex: 1;
+    }
+
+    .timer-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8B6914;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .timer-countdown {
+      font-size: 22px;
+      font-weight: 700;
+      color: #B8860B;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+    }
+
+    .timer-countdown.urgent { color: var(--error); }
+
+    .timer-sub {
+      font-size: 11px;
+      color: #8B6914;
+      margin-top: 2px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--green-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* ── Payment details ── */
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .payment-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .payment-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .payment-emoji {
+      font-size: 22px;
+    }
+
+    .payment-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .payment-number {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn {
+      background: var(--green-dim);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover { background: #D0EBDA; }
+    .copy-btn.copied { background: var(--green); color: white; }
+
+    .amount-note {
+      background: var(--green-dim);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    label .am {
+      font-family: 'Noto Sans Ethiopic', sans-serif;
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(26,122,74,0.08);
+    }
+
+    input[type="text"].error { border-color: var(--error); }
+
+    .field-error {
+      font-size: 11px;
+      color: var(--error);
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* ── Upload Zone ── */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      background: var(--surface);
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--green);
+      background: var(--green-dim);
+    }
+
+    .upload-zone.has-file {
+      border-color: var(--green-light);
+      background: var(--green-dim);
+      border-style: solid;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+
+    .upload-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .upload-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .upload-sub .am {
+      font-family: 'Noto Sans Ethiopic', sans-serif;
+    }
+
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: white;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .file-preview.visible { display: flex; }
+
+    .file-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .file-info { flex: 1; text-align: left; }
+    .file-name { font-size: 12px; font-weight: 600; color: var(--dark); }
+    .file-size { font-size: 11px; color: var(--muted); }
+
+    .file-remove {
+      background: none;
+      border: none;
+      color: var(--error);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+    }
+
+    /* ── Submit Button ── */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .submit-btn:hover { background: #155F3A; }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+
+    .submit-am {
+      font-family: 'Noto Sans Ethiopic', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    /* ── Success State ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 48px 20px;
+    }
+
+    .success-screen.visible { display: block; }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--green-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 20px;
+    }
+
+    .success-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto 24px;
+    }
+
+    .success-sub .am {
+      font-family: 'Noto Sans Ethiopic', sans-serif;
+    }
+
+    .order-ref-box {
+      background: var(--green-dim);
+      border-radius: var(--radius-sm);
+      padding: 12px 20px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .order-ref-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .order-ref-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--green);
+      margin-top: 2px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--green-dim);
+      color: var(--green);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .back-btn:hover { background: #D0EBDA; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 400px) {
+      .payment-item { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg width="80" height="30" viewBox="0 0 356.41 132.02" xmlns="http://www.w3.org/2000/svg" fill="#1A7A4A">
+      <path d="m9.28,109.72c4.89,1.8,9.16,3.57,13.56,4.93,8.61,2.68,17.39,4.23,26.39,2.28,7.35-1.59,10.54-5.55,10.78-13.08.08-2.56.01-5.12.01-7.05-6.23,1.69-12.16,4.06-18.3,4.82-16.77,2.07-32.42-6.28-38.2-19.94C-4.63,62.38.3,34.29,29.59,25.8c14.14-4.1,28.44-2.99,42.74-.97,2.88.41,6.79.19,8.27,1.93,1.49,1.75.65,5.58.65,8.49-.03,22.62-.09,45.25-.16,67.87-.05,13.27-5.82,21.78-18.44,25.7-17.04,5.28-33.97,3.64-50.6-2.23-.77-.27-1.73-1.28-1.8-2.02-.44-4.81-.65-9.64-.96-14.86Zm50.68-48.76h.03c0-6.44-.06-12.89.03-19.33.03-1.96-.52-2.92-2.61-2.96-3.5-.06-7-.49-10.49-.39-8.33.22-15.59,2.91-20.33,10.21-3.72,5.73-4.5,12.18-3.92,18.88,1.78,20.65,22.74,24.32,35.09,16.27,1.13-.74,2.06-2.64,2.11-4.04.23-6.21.1-12.43.1-18.65Z"/>
+      <path d="m294.06,98.71c-4.21.95-8.11,2.04-12.09,2.69-12.23,2.02-24.48,2.77-36.8.55-20.08-3.61-32.56-17.78-32.99-37.61-.47-21.66,15.28-39.19,37.01-41.11,7.98-.71,15.8-.16,23.27,3.18,10.3,4.61,16.97,12.42,19.67,23.22,1.52,6.08,1.81,12.46,2.73,19.23h-60c.41,6.95,3.62,11.7,8.84,15.17,8.56,5.7,18.22,5.76,27.86,4.59,6.8-.82,13.49-2.56,20.62-3.96.58,4.31,1.2,8.96,1.89,14.03Zm-18.81-43.11c-.05-6.53-1.87-12.1-7.43-15.53-7.74-4.78-15.97-4.74-23.84-.44-6.04,3.3-8.77,8.99-9.54,15.97h40.81Z"/>
+      <path d="m354.09,88.22c.77,4.24,1.5,8.2,2.32,12.73-11.69,1.75-23.02,4.22-34.34.01-6.95-2.59-10.67-8.12-10.98-15.37-.47-10.84-.37-21.71-.49-32.57-.04-3.84,0-7.67,0-11.99h-11.48v-14.93h11.51c0-4.76.1-9.14-.04-13.52-.06-1.94.55-2.77,2.47-3.23,6.34-1.52,12.63-3.25,19.37-5.01v21.7h21.84v14.78h-20.97c-.46.56-.72.73-.72.9,0,12.78-.17,25.56.14,38.33.14,5.9,2.71,8.13,8.69,8.78,2.12.23,4.29.08,6.43-.03,2.01-.1,4.01-.37,6.27-.59Z"/>
+      <path d="m194.3,28.81c-15.77.53-31.53,1.06-48.22,1.62,3.15,4.92,5.82,9.11,8.59,13.44-2.74,1.83-4.95.77-6.25-.66-4.54-5.01-8.96-10.16-12.97-15.59-1.96-2.66-.32-4.79,3.44-4.85,7.81-.12,15.62-.02,23.43-.13,13.01-.19,26.01-.5,39.01-.7,1.34-.02,2.72.2,4.02.55,3.73,1,4.73,4.06,2.19,6.92-15.16,17.1-30.4,34.12-45.53,51.24-5.24,5.93-10.26,12.06-15.34,18.13-.84,1-1.46,2.18-2.66,4,18.89-.3,37.1-1.32,54.79,4.43.17-.37.34-.73.51-1.1-2.6-4.2-5.3-8.35-7.76-12.63-.9-1.56-3.5-3.48-1.12-5.18,2.24-1.6,4.32.48,5.63,2.34,4.22,6.01,8.43,12.04,12.34,18.25,2.17,3.45.81,5.73-3.31,5.74-2.8.01-5.7-.32-8.37-1.13-17.47-5.27-35.38-4.3-53.25-4.09-2.15.03-4.33.14-6.44-.17-4.94-.71-6.34-3.64-3.28-7.49,7.23-9.12,14.57-18.17,22.16-26.99,12.25-14.23,24.74-28.24,37.11-42.37.64-.73,1.1-1.62,1.65-2.44-.12-.39-.25-.78-.37-1.17Z"/>
+      <path d="m121.04,101.65h-22.49V25.29h22.49v76.36Z"/>
+      <path d="m98.24,9.85c7.68-3.24,15.35-6.48,23.31-9.85v10.8h-23.02c-.1-.32-.19-.64-.29-.96Z"/>
+    </svg>
+  </div>
+  <div class="secure-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Secure Payment
+  </div>
+</header>
+
+<main>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step done">
+      <div class="step-dot">✓</div>
+      <span>Order Placed</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+      <div class="step-dot">2</div>
+      <span>Pay & Confirm</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <span>Delivered</span>
+    </div>
+  </div>
+
+  <!-- Timer Banner -->
+  <div class="timer-banner">
+    <div class="timer-icon">⏱️</div>
+    <div class="timer-text">
+      <div class="timer-label">Order reserved for</div>
+      <div class="timer-countdown" id="countdown">60:00</div>
+      <div class="timer-sub">Upload your receipt before time runs out</div>
+    </div>
+  </div>
+
+  <!-- Form (shown by default) -->
+  <div id="form-screen">
+
+    <!-- Payment Details Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">💳</div>
+        <div>
+          <div class="card-title">Send payment to</div>
+          <div class="card-sub">ከዚህ በታች ወዳለው አካውንት ይላኩ</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="payment-options">
+          <div class="payment-item">
+            <div class="payment-item-left">
+              <div class="payment-emoji">🏦</div>
+              <div>
+                <div class="payment-name">Commercial Bank of Ethiopia (CBE)</div>
+                <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">Account Name: <strong style="color:var(--dark);">Natnael Mikias Endale</strong></div>
+                <div class="payment-number" id="cbe-num">1000391353461</div>
+              </div>
+            </div>
+            <button class="copy-btn" onclick="copyNumber('cbe-num', this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Order reference for the customer -->
+        <div style="margin-top:12px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Your Order Number</div>
+            <div style="font-size:18px;font-weight:700;color:var(--dark);margin-top:3px;" id="order-ref-display">—</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Use this as your payment reference</div>
+          </div>
+          <button class="copy-btn" onclick="copyOrderNum(this)">Copy</button>
+        </div>
+
+        <div class="amount-note" id="amount-display">
+          Send exactly: <strong>ETB —</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">📋</div>
+        <div>
+          <div class="card-title">Confirm your payment</div>
+          <div class="card-sub">Enter your order number and upload receipt</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div class="form-group">
+          <label>Order Number <span class="am">/ የትዕዛዝ ቁጥር</span></label>
+          <input type="text" id="order-number" placeholder="e.g. #GZ-1042" />
+          <div class="field-error" id="order-error">Please enter your order number</div>
+        </div>
+
+        <div class="form-group">
+          <label>Your Phone Number <span class="am">/ ስልክ ቁጥር</span></label>
+          <input type="text" id="phone-number" placeholder="09XX XXX XXX" />
+          <div class="field-error" id="phone-error">Please enter your phone number</div>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Screenshot <span class="am">/ የክፍያ ስክሪን ሾት</span></label>
+          <div class="upload-zone" id="upload-zone"
+               ondragover="handleDragOver(event)"
+               ondragleave="handleDragLeave(event)"
+               ondrop="handleDrop(event)">
+            <input type="file" id="receipt-file" accept="image/*,.pdf"
+                   onchange="handleFileSelect(event)" />
+            <div class="upload-icon">📸</div>
+            <div class="upload-title">Tap to upload screenshot</div>
+            <div class="upload-sub">
+              <span class="am">ፎቶ ወይም ስክሪን ሾቱን ያስቀምጡ</span><br/>
+              JPG, PNG or PDF · Max 10MB
+            </div>
+            <div class="file-preview" id="file-preview">
+              <img class="file-thumb" id="file-thumb" src="" alt="" />
+              <div class="file-info">
+                <div class="file-name" id="file-name"></div>
+                <div class="file-size" id="file-size"></div>
+              </div>
+              <button class="file-remove" onclick="removeFile(event)">✕</button>
+            </div>
+          </div>
+          <div class="field-error" id="file-error">Please upload your payment screenshot</div>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+          <span id="btn-text">Confirm Payment</span>
+          <span class="submit-am" id="btn-am">· ክፍያ አረጋግጥ</span>
+        </button>
+
+      </div>
+    </div>
+
+  </div><!-- /form-screen -->
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Receipt Received!</div>
+    <div class="success-sub">
+      Our team will verify your payment within <strong>15 minutes</strong> and confirm your order.<br/><br/>
+      <span class="am">ቡድናችን ክፍያዎን በ15 ደቂቃ ውስጥ ያረጋግጣሉ።</span>
+    </div>
+    <div class="order-ref-box">
+      <div class="order-ref-label">Your Order</div>
+      <div class="order-ref-value" id="success-order-num">—</div>
+    </div>
+    <br/>
+    <a href="https://gizet.co" class="back-btn">← Back to gizet.co</a>
+  </div>
+
+</main>
+
+<footer>
+  © 2025 Gizet · Addis Ababa · Questions? WhatsApp us
+</footer>
+
+<script>
+  // ── URL param: pre-fill order number and amount ──
+  const params = new URLSearchParams(window.location.search);
+  const orderParam   = params.get('order');
+  const amountParam  = params.get('amount');
+  const phoneParam   = params.get('phone');
+
+  // ── Persist UTMs from URL into sessionStorage so they survive redirects ──
+  const utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+  utmKeys.forEach(k => { if (params.get(k)) sessionStorage.setItem(k, params.get(k)); });
+  const utmData = {};
+  utmKeys.forEach(k => { const v = params.get(k) || sessionStorage.getItem(k); if (v) utmData[k] = v; });
+
+  if (orderParam) {
+    const decoded = decodeURIComponent(orderParam);
+    document.getElementById('order-number').value = decoded;
+    document.getElementById('order-ref-display').textContent = decoded;
+  }
+  if (phoneParam) document.getElementById('phone-number').value = decodeURIComponent(phoneParam);
+  if (amountParam) {
+    const formatted = Number(amountParam).toLocaleString('en-ET');
+    document.getElementById('amount-display').innerHTML =
+      `Send exactly: <strong>ETB ${formatted}</strong>`;
+  }
+
+  // ── Countdown Timer (60 min) ──
+  const SIXTY_MIN = 60 * 60;
+  let remaining = SIXTY_MIN;
+  const countdownEl = document.getElementById('countdown');
+
+  const timer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(timer);
+      countdownEl.textContent = '00:00';
+      countdownEl.classList.add('urgent');
+      return;
+    }
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    countdownEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (remaining <= 300) countdownEl.classList.add('urgent');
+  }, 1000);
+
+  // ── Copy number ──
+  function copyNumber(id, btn) {
+    const num = document.getElementById(id).textContent.replace(/\s/g, '');
+    navigator.clipboard.writeText(num).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function copyOrderNum(btn) {
+    const num = document.getElementById('order-ref-display').textContent;
+    navigator.clipboard.writeText(num).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // ── File handling ──
+  let selectedFile = null;
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) setFile(file);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.add('drag-over');
+  }
+
+  function handleDragLeave(e) {
+    document.getElementById('upload-zone').classList.remove('drag-over');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  }
+
+  function setFile(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File too large. Maximum size is 10MB.');
+      return;
+    }
+    selectedFile = file;
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-size').textContent = (file.size / 1024).toFixed(0) + ' KB';
+
+    const zone = document.getElementById('upload-zone');
+    zone.classList.add('has-file');
+
+    const preview = document.getElementById('file-preview');
+    preview.classList.add('visible');
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => document.getElementById('file-thumb').src = e.target.result;
+      reader.readAsDataURL(file);
+    } else {
+      document.getElementById('file-thumb').src = '';
+      document.getElementById('file-thumb').style.display = 'none';
+    }
+  }
+
+  function removeFile(e) {
+    e.stopPropagation();
+    selectedFile = null;
+    document.getElementById('receipt-file').value = '';
+    document.getElementById('upload-zone').classList.remove('has-file');
+    document.getElementById('file-preview').classList.remove('visible');
+    document.getElementById('file-thumb').src = '';
+  }
+
+  // ── Form Validation & Submit ──
+  function handleSubmit() {
+    let valid = true;
+
+    const orderVal = document.getElementById('order-number').value.trim();
+    const phoneVal = document.getElementById('phone-number').value.trim();
+
+    // Validate order number
+    if (!orderVal) {
+      document.getElementById('order-error').style.display = 'block';
+      document.getElementById('order-number').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('order-error').style.display = 'none';
+      document.getElementById('order-number').classList.remove('error');
+    }
+
+    // Validate phone
+    if (!phoneVal) {
+      document.getElementById('phone-error').style.display = 'block';
+      document.getElementById('phone-number').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('phone-error').style.display = 'none';
+      document.getElementById('phone-number').classList.remove('error');
+    }
+
+    // Validate file
+    if (!selectedFile) {
+      document.getElementById('file-error').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('file-error').style.display = 'none';
+    }
+
+    if (!valid) return;
+
+    // Loading state
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    document.getElementById('btn-text').textContent = 'Sending...';
+    document.getElementById('btn-am').textContent = '';
+    btn.innerHTML = '<div class="spinner"></div><span>Sending receipt...</span>';
+
+    const fd = new FormData();
+    fd.append('orderNumber', orderVal);
+    fd.append('phone', phoneVal);
+    if (amountParam) fd.append('totalPrice', amountParam);
+    fd.append('receipt', selectedFile);
+    Object.entries(utmData).forEach(([k, v]) => fd.append(k, v));
+
+    fetch('/api/gizet/payment-confirm', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        onUploadSuccess(orderVal);
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<span id="btn-text">Confirm Payment</span><span class="submit-am">· ክፍያ አረጋግጥ</span>';
+        alert('Upload failed: ' + err.message);
+      });
+  }
+
+  function onUploadSuccess(orderNum) {
+    clearInterval(timer);
+
+    // ── Fire Meta Pixel Purchase event ──
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'Purchase', {
+        value: amountParam ? Number(amountParam) : 0,
+        currency: 'ETB',
+        content_ids: [orderNum],
+        content_type: 'product',
+        order_id: orderNum,
+      });
+    }
+
+    // Show success screen
+    document.getElementById('success-order-num').textContent = orderNum;
+    document.getElementById('form-screen').style.display = 'none';
+    document.getElementById('success-screen').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
