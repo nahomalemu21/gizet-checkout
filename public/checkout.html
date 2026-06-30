@@ -276,6 +276,26 @@
   let qty = Math.max(1, parseInt(params.get('quantity') || params.get('qty') || '1', 10) || 1);
   let filteredProducts = [...PRODUCTS];
 
+  // ── Multi-item cart from ?items=variantId:qty,variantId:qty ──
+  let cartItems = null;
+  const itemsParam = params.get('items');
+  if (itemsParam) {
+    cartItems = itemsParam.split(',').map(pair => {
+      const [vid, q] = pair.split(':');
+      const product = PRODUCTS.find(p => String(p.variantId) === String(vid));
+      return product ? { product, qty: Math.max(1, parseInt(q, 10) || 1) } : null;
+    }).filter(Boolean);
+    if (!cartItems.length) cartItems = null;
+  }
+  function grandTotal() {
+    return cartItems
+      ? cartItems.reduce((s, it) => s + it.product.price * it.qty, 0)
+      : selectedProduct.price * qty;
+  }
+  function totalQty() {
+    return cartItems ? cartItems.reduce((s, it) => s + it.qty, 0) : qty;
+  }
+
   function renderProducts(list) {
     const container = document.getElementById('product-list');
     container.innerHTML = list.map((p, i) => `
@@ -310,12 +330,39 @@
   }
 
   function updateTotal() {
-    const total = selectedProduct.price * qty;
-    document.getElementById('total-display').textContent = 'ETB ' + total.toLocaleString();
+    document.getElementById('total-display').textContent = 'ETB ' + grandTotal().toLocaleString();
   }
 
-  // If coming from a product page, pre-select and hide the picker
-  if (variantParam) {
+  function renderCart() {
+    document.querySelector('.card').innerHTML = `
+      <div class="card-header">
+        <div class="card-header-icon">🛍️</div>
+        <div>
+          <div class="card-title">Your order</div>
+          <div class="card-sub">የእርስዎ ትዕዛዝ · ${cartItems.length} item(s)</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+        ${cartItems.map(it => `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img src="${it.product.image}" onerror="this.style.display='none'" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:var(--dark);">${it.product.title}</div>
+              <div style="font-size:12px;color:var(--muted);">Qty ${it.qty} × ETB ${it.product.price.toLocaleString()}</div>
+            </div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);white-space:nowrap;">ETB ${(it.product.price * it.qty).toLocaleString()}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    // Each item carries its own quantity, so hide the single quantity stepper
+    const qtyGroup = document.getElementById('qty-display').closest('.form-group');
+    if (qtyGroup) qtyGroup.style.display = 'none';
+  }
+
+  // Display mode: cart (multi-item) > single product > full picker
+  if (cartItems) {
+    renderCart();
+  } else if (variantParam) {
     const match = PRODUCTS.find(p => String(p.variantId) === variantParam);
     if (match) {
       selectedProduct = match;
@@ -375,7 +422,7 @@
     btn.innerHTML = '<div class="spinner"></div><span>Placing order...</span>';
 
     if (typeof fbq !== 'undefined') {
-      fbq('track', 'InitiateCheckout', { value: selectedProduct.price * qty, currency: 'ETB', num_items: qty });
+      fbq('track', 'InitiateCheckout', { value: grandTotal(), currency: 'ETB', num_items: totalQty() });
     }
 
     const noteExtra = [
@@ -384,13 +431,22 @@
       region       && `Region: ${region}`,
     ].filter(Boolean).join(' | ');
 
+    const lineItems = cartItems
+      ? cartItems.map(it => ({
+          title:      it.product.title,
+          quantity:   it.qty,
+          price:      String(it.product.price),
+          variant_id: it.product.variantId,
+        }))
+      : [{
+          title:    selectedProduct.title,
+          quantity: qty,
+          price:    String(selectedProduct.price),
+          ...(selectedProduct.variantId ? { variant_id: selectedProduct.variantId } : {}),
+        }];
+
     const payload = {
-      lineItems: [{
-        title:    selectedProduct.title,
-        quantity: qty,
-        price:    String(selectedProduct.price),
-        ...(selectedProduct.variantId ? { variant_id: selectedProduct.variantId } : {}),
-      }],
+      lineItems,
       customer: { first_name: firstName, last_name: lastName, phone },
       shippingAddress: {
         first_name:   firstName,
@@ -412,7 +468,7 @@
 
       // Fire Meta Pixel Lead event
       if (typeof fbq !== 'undefined') {
-        fbq('track', 'Lead', { value: selectedProduct.price * qty, currency: 'ETB' });
+        fbq('track', 'Lead', { value: grandTotal(), currency: 'ETB' });
       }
 
       window.location.href = data.confirmUrl;
